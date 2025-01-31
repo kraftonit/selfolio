@@ -1,0 +1,55 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // Or your chosen database provider
+  url      = env("DATABASE_URL")
+}
+
+model Portfolio {
+  id          Int       @id @default(autoincrement())
+  category    String    @unique // e.g., "BASIC", "LAWYER", "DEVELOPER", "DESIGNER", "PHOTOGRAPHER"
+  theme       String    @unique // e.g.,"BASIC", "MODERN", "CLASSIC", "Minimalist"
+  name        String? // Portfolio name (e.g., "John Doe's Portfolio")
+  slug        String? // URL-friendly slug (e.g., "john-doe-portfolio") - important for SEO
+  description String?
+  status      Status?   @default(ACTIVE)
+  sections    Section[]
+  published   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Section {
+  id          Int       @id @default(autoincrement())
+  portfolioId Int
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
+  name        String
+  type        String
+  data        Json
+  order       Int
+  status      Status?   @default(ACTIVE)
+  Blog        Blog[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Blog {
+  id        Int      @id @default(autoincrement())
+  sectionId Int
+  section   Section  @relation(fields: [sectionId], references: [id])
+  title     String
+  slug      String   @unique
+  content   String
+  status    Status   @default(ACTIVE)
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
